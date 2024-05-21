@@ -4,16 +4,16 @@ SRCS := \
 	imgui/imgui_draw.cpp \
 	imgui/imgui_demo.cpp \
 	imgui/imgui.cpp \
-	imgui/misc/cpp/imgui_stdlib.cpp \
-	imgui/backends/imgui_impl_sdl2.cpp \
-	imgui/backends/imgui_impl_sdlrenderer2.cpp \
+	imgui/imgui_stdlib.cpp \
+	imgui/imgui_impl_sdl2.cpp \
+	imgui/imgui_impl_opengl3.cpp \
 	src/main.cpp
 
 OBJS := $(addprefix build/obj/, $(addsuffix .o, $(SRCS)))
 
-INCLUDES := -I. -Iimgui -I/usr/include/SDL2
-LIBS := -lSDL2 -lSDL2_image -lSDL2_ttf
-FLAGS := -Wall -Werror 
+INCLUDES := -I/usr/include/SDL2
+LIBS := -lSDL2 -lSDL2_image -lGLEW -lGL -lglm
+FLAGS := -Wall
 
 run: $(OBJS) build/a.out
 	./build/a.out
@@ -29,3 +29,4 @@ clean:
 	rm -rf build/
 
 .PHONY: clean
+

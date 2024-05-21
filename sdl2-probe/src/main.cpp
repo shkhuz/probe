@@ -16,6 +16,7 @@ typedef uint32_t u32;
 typedef uint64_t u64;
 
 #include "texture.cpp"
+#include "timer.cpp"
 
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 480;
@@ -52,6 +53,7 @@ int init() {
     }
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xff);
+    SDL_SetHint ("SDL_RENDER_BATCHING", "1") ;
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         fprintf(stderr, "SDL_image cannot be initialized! %s\n", SDL_GetError());
@@ -74,8 +76,8 @@ int init() {
 }
 
 bool load_res() {
-    if (!colored_sheet.load_from_file(renderer, "colored_packed_rgb.png")) return false;
-    if (!transparent_sheet.load_from_file(renderer, "transparent_packed_rgb.png")) return false;
+    if (!colored_sheet.load_from_file(renderer, "res/colored_packed_rgb.png")) return false;
+    if (!transparent_sheet.load_from_file(renderer, "res/transparent_packed_rgb.png")) return false;
     transparent_sheet.set_blend_mode(SDL_BLENDMODE_BLEND);
     return true;
 }
@@ -105,31 +107,43 @@ int main() {
 
     SDL_Event e;
     bool running = true;
+
+    Timer fps_timer;
+    int fps = 0;
+    int counted_frames = 0;
+    fps_timer.start();
+
     while (running) {
         while (SDL_PollEvent(&e)) {
             ImGui_ImplSDL2_ProcessEvent(&e);
             if (e.type == SDL_QUIT) running = false;
             else if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym) {
-                    case SDLK_UP: printf("Up!\n"); break;
-                    case SDLK_DOWN: printf("Down!\n"); break;
                 }
             }
+        }
+
+        SDL_RenderClear(renderer);
+        if (fps_timer.get_ticks() > 1000) {
+            fps = counted_frames;
+            counted_frames = 0;
+            fps_timer.start();
         }
 
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow(NULL);
+        ImGui::Text("FPS: %d", fps);
 
-        SDL_RenderClear(renderer);
-
-        //render_sheet_frame(colored_sheet, 0, 0, 0, 0);
-        render_sheet_frame(transparent_sheet, 0, 0, 0, 1);
+        for (int i = 0; i < 100000; i++) {
+            render_sheet_frame(colored_sheet, 0, 0, 0, 0);
+            render_sheet_frame(transparent_sheet, 0, 0, 0, 1);
+        }
 
         ImGui::Render();
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
         SDL_RenderPresent(renderer);
+        counted_frames++;
     }
 
     return 0;
