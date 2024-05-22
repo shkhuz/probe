@@ -81,7 +81,7 @@ int main() {
         return 1;
     }
 
-    float size = 400.0f;
+    float size = 300.0f;
     float vertices[] = {
         0.0f, size, 0.0f,      1.0f, 0.0f, 0.0f, 1.0f,    0.0f, 0.0f,
         size, size, 0.0f,    0.0f, 1.0f, 0.0f, 1.0f,    1.0f, 0.0f,
@@ -178,7 +178,7 @@ int main() {
     );
     SDL_FreeSurface(png);
 
-    Camera camera;
+    Camera camera(window);
     camera.set_proj();
     camera.set_view();
 
